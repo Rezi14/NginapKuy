@@ -1,9 +1,10 @@
 <?php
-
 // routes/web.php
+namespace App\Http\Controllers;
 use Illuminate\Support\Facades\Route;
-
-// KARENA BookingController dan DashboardController ADA DI app/Http/Controllers/
+use App\Http\Controllers\Controller;
+// KARENA AdminController, DashboardController, BookingController ADA DI app/Http/Controllers/
+use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\DashboardController; // Dashboard umum
 use App\Http\Controllers\BookingController; // Untuk pemesanan
 
@@ -11,40 +12,35 @@ use App\Http\Controllers\BookingController; // Untuk pemesanan
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 
-// Karena Admin/DashboardController ada di subfolder Admin
-use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+
+// --- Rute Umum (BISA DIAKSES TANPA LOGIN) ---
+Route::get('/', [DashboardController::class, 'index'])->name('home');
+Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
 
-// Rute Halaman Utama (Welcome Page)
-// Route::get('/', function () {
-//     return view('welcome');
-// });
-
-// Rute Dashboard Umum (BISA DIAKSES TANPA LOGIN)
-Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
-
-
-// Rute Autentikasi (Login, Register, Logout)
+// --- Rute Autentikasi (Login, Register, Logout) ---
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [LoginController::class, 'login']);
-
 Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
 Route::post('/register', [RegisterController::class, 'register']);
-
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
 
-// Grup Rute yang MEMERLUKAN AUTENTIKASI (untuk pelanggan yang ingin memesan dan admin)
+// --- Grup Rute yang MEMERLUKAN AUTENTIKASI (Login) ---
 Route::middleware('auth')->group(function () {
 
-    // Rute Pemesanan Kamar (MEMERLUKAN LOGIN)
+    // Rute Pemesanan Kamar
     Route::get('/pesan-kamar/{kamar}', [BookingController::class, 'showBookingForm'])->name('booking.create');
     Route::post('/pesan-kamar', [BookingController::class, 'store'])->name('booking.store');
 
-    // Grup rute khusus ADMIN (MEMERLUKAN LOGIN DAN ROLE ADMIN)
+    // >>> Rute Dashboard Admin (TANPA PREFIX /ADMIN/) <<<
+    // URL: /dashboardadmin
+    // Nama Rute: dashboardadmin
+    // Middleware 'admin' akan memastikan hanya user dengan role 'admin' yang bisa mengakses
     Route::middleware('admin')->prefix('admin')->name('admin.')->group(function () {
         // Rute Dashboard Admin
-        Route::get('/dashboardamin', [AdminDashboardController::class, 'index'])->name('dashboard');
+        Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard'); // Menggunakan alias
         // Tambahkan rute manajemen admin lainnya di sini jika diperlukan
+        // Route::get('/users', [Admin\UserController::class, 'index'])->name('users.index');
     });
 });
