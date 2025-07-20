@@ -44,9 +44,9 @@ class LoginController extends Controller
             // Logika redirect berdasarkan role
             $user = Auth::user();
             if ($user->role && $user->role->nama_role === 'admin') {
-                return redirect()->intended('/admin/dashboard')->with('success', 'Selamat datang, Admin NginapKuy!');
+                return redirect()->intended('/dashboardadmin')->with('success', 'Selamat datang, Admin NginapKuy!');
             } else {
-                return redirect()->intended('/dashboard')->with('success', 'Berhasil login!');
+                return redirect()->intended('/')->with('success', 'Berhasil login!');
             }
         }
 
@@ -66,6 +66,6 @@ class LoginController extends Controller
         $request->session()->invalidate(); // Invalidasi session saat ini
         $request->session()->regenerateToken(); // Regenerasi token CSRF
 
-        return redirect('/login')->with('success', 'Anda telah logout.'); // Redirect ke halaman utama
+        return redirect('/')->with('success', 'Anda telah logout.'); // Redirect ke halaman utama
     }
 }

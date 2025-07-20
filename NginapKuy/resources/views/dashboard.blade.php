@@ -12,12 +12,17 @@
 
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
         <div class="container-fluid px-4">
-            <a class="navbar-brand fs-4 fw-bold" href="#">Halo, {{ $user->name }}!</a>
+            <a class="navbar-brand fs-4 fw-bold" href="#">Halo, {{ $user ? $user->name : 'Pengunjung' }}!</a>
             <div class="ms-auto">
-                <form action="{{ route('logout') }}" method="POST" class="d-flex">
-                    @csrf
-                    <button type="submit" class="btn btn-danger">Logout</button>
-                </form>
+                @if ($user)
+                    <form action="{{ route('logout') }}" method="POST" class="d-flex">
+                        @csrf
+                        <button type="submit" class="btn btn-danger">Logout</button>
+                    </form>
+                @else
+                    <a href="{{ route('login') }}" class="btn btn-light me-2">Login</a>
+                    <a href="{{ route('register') }}" class="btn btn-success">Register</a>
+                @endif
             </div>
         </div>
     </nav>
@@ -59,7 +64,12 @@
                                     </div>
                                     
                                     <div class="mt-3 text-center">
-                                        <a href="{{ route('booking.create', ['kamar' => $kamar->id_kamar]) }}" class="btn btn-success w-100">Pesan Sekarang</a>
+                                        {{-- Cek apakah pengguna sudah login sebelum menampilkan tombol pesan --}}
+                                        @if ($user)
+                                            <a href="{{ route('booking.create', ['kamar' => $kamar->id_kamar]) }}" class="btn btn-success w-100">Pesan Sekarang</a>
+                                        @else
+                                            <a href="{{ route('login') }}" class="btn btn-primary w-100">Login untuk Memesan</a>
+                                        @endif
                                     </div>
                                 </div>
                             </div>

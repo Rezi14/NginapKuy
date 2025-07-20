@@ -21,7 +21,7 @@ use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 // });
 
 // Rute Dashboard Umum (BISA DIAKSES TANPA LOGIN)
-Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 
 
 // Rute Autentikasi (Login, Register, Logout)
@@ -44,7 +44,7 @@ Route::middleware('auth')->group(function () {
     // Grup rute khusus ADMIN (MEMERLUKAN LOGIN DAN ROLE ADMIN)
     Route::middleware('admin')->prefix('admin')->name('admin.')->group(function () {
         // Rute Dashboard Admin
-        Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
+        Route::get('/dashboardamin', [AdminDashboardController::class, 'index'])->name('dashboard');
         // Tambahkan rute manajemen admin lainnya di sini jika diperlukan
     });
 });
