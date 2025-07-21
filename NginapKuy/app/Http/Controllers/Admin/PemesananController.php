@@ -135,7 +135,6 @@ class PemesananController extends Controller
             'check_in_date' => 'required|date',
             'check_out_date' => 'required|date|after:check_in_date',
             'total_harga' => 'required|numeric|min:0',
-            // Tambahkan 'paid' ke daftar status yang valid
             'status_pemesanan' => 'required|string|in:pending,confirmed,checked_in,checked_out,cancelled,paid',
             'fasilitas_tambahan' => 'nullable|array',
             'fasilitas_tambahan.*' => 'exists:fasilitas,id',
