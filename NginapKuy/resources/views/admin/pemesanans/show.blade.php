@@ -136,7 +136,7 @@
                     <h5>Aksi Admin</h5>
                     <div class="d-flex gap-2">
                         {{-- Contoh: Tombol untuk mengubah status --}}
-                        {{-- <form action="{{ route('admin.pemesanans.update_status', $pemesanan->id_pemesanan) }}" method="POST">
+                        <form action="{{ route('admin.pemesanans.update_status', $pemesanan->id_pemesanan) }}" method="POST">
                             @csrf
                             @method('PUT')
                             <input type="hidden" name="status" value="confirmed">
@@ -153,15 +153,15 @@
                             @method('PUT')
                             <input type="hidden" name="status" value="checked_out">
                             <button type="submit" class="btn btn-info">Check-out</button>
-                        </form> --}}
+                        </form>
                         {{-- Tombol Edit (jika Anda mengaktifkan rute edit) --}}
-                        {{-- <a href="{{ route('admin.pemesanans.edit', $pemesanan->id_pemesanan) }}" class="btn btn-warning">Edit Detail</a> --}}
+                        <a href="{{ route('admin.pemesanans.edit', $pemesanan->id_pemesanan) }}" class="btn btn-warning">Edit Detail</a>
                         {{-- Tombol Hapus (jika Anda mengaktifkan rute destroy) --}}
-                        {{-- <form action="{{ route('admin.pemesanans.destroy', $pemesanan->id_pemesanan) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus pemesanan ini?');">
+                        <form action="{{ route('admin.pemesanans.destroy', $pemesanan->id_pemesanan) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus pemesanan ini?');">
                             @csrf
                             @method('DELETE')
                             <button type="submit" class="btn btn-danger">Hapus Pemesanan</button>
-                        </form> --}}
+                        </form>
                     </div>
                 </div>
             </div>
