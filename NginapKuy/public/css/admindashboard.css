@@ -30,6 +30,7 @@ body {
 .sidebar .nav-link {
     color: rgba(236, 240, 241, 0.8);
     padding: 12px 15px;
+    text-align: left;
     transition: all 0.3s ease;
     border-radius: 5px; /* Sudut sedikit membulat */
     margin-bottom: 5px;
@@ -53,7 +54,8 @@ body {
 .sidebar .nav-link.active {
     color: white;
     background-color: #1abc9c; /* Warna aktif yang menarik (hijau toska) */
-    font-weight: 600;
+    font-weight: 400;
+    width: 100%
 }
 
 .main-content {

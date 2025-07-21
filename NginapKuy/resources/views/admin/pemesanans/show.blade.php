@@ -51,17 +51,17 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link {{ request()->routeIs('admin.users.*') ? 'active' : '' }}" href="#">
+                    <a class="nav-link {{ request()->routeIs('admin.users.*') ? 'active' : '' }}" href="{{ route('admin.users.index') }}">
                         <i class="fas fa-users me-2"></i> Manajemen Pengguna
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link {{ request()->routeIs('admin.fasilitas.*') ? 'active' : '' }}" href="#">
+                    <a class="nav-link {{ request()->routeIs('admin.fasilitas.*') ? 'active' : '' }}" href="{{ route('admin.fasilitas.index') }}">
                         <i class="fas fa-spa me-2"></i> Manajemen Fasilitas
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link {{ request()->routeIs('admin.transaksi.*') ? 'active' : '' }}" href="#">
+                    <a class="nav-link {{ request()->routeIs('admin.riwayat.transaksi') ? 'active' : '' }}" href="{{ route('admin.riwayat.transaksi') }}">
                         <i class="fas fa-history me-2"></i> Riwayat Transaksi
                     </a>
                 </li>
@@ -70,6 +70,19 @@
 
         {{-- Konten Utama Detail Pemesanan --}}
         <div class="main-content">
+            @if (session('success'))
+                <div class="alert alert-success alert-dismissible fade show text-center" role="alert">
+                    {{ session('success') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            @endif
+            @if (session('error'))
+                <div class="alert alert-danger alert-dismissible fade show text-center" role="alert">
+                    {{ session('error') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            @endif
+
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h2 class="mb-0">Detail Pemesanan #{{ $pemesanan->id_pemesanan }}</h2>
                 <a href="{{ route('admin.pemesanans.index') }}" class="btn btn-secondary">
@@ -102,8 +115,8 @@
                     <div class="row mb-3">
                         <div class="col-md-4"><strong>Status Pemesanan:</strong></div>
                         <div class="col-md-8">
-                            <span class="badge {{ $pemesanan->status == 'pending' ? 'bg-warning text-dark' : ($pemesanan->status == 'confirmed' ? 'bg-success' : ($pemesanan->status == 'checked_in' ? 'bg-primary' : ($pemesanan->status == 'checked_out' ? 'bg-info' : 'bg-secondary'))) }}">
-                                {{ ucfirst(str_replace('_', ' ', $pemesanan->status)) }}
+                            <span class="badge {{ $pemesanan->status_pemesanan == 'pending' ? 'bg-warning text-dark' : ($pemesanan->status_pemesanan == 'confirmed' ? 'bg-success' : ($pemesanan->status_pemesanan == 'checked_in' ? 'bg-primary' : ($pemesanan->status_pemesanan == 'checked_out' ? 'bg-info' : ($pemesanan->status_pemesanan == 'paid' ? 'bg-dark' : 'bg-secondary')))) }}">
+                                {{ ucfirst(str_replace('_', ' ', $pemesanan->status_pemesanan)) }}
                             </span>
                         </div>
                     </div>
@@ -132,35 +145,39 @@
 
                     <hr>
 
-                    {{-- Bagian untuk Aksi Admin (misal: Ubah Status) --}}
+                    {{-- Bagian untuk Aksi Admin --}}
                     <h5>Aksi Admin</h5>
-                    <div class="d-flex gap-2">
-                        {{-- Contoh: Tombol untuk mengubah status --}}
-                        <form action="{{ route('admin.pemesanans.update_status', $pemesanan->id_pemesanan) }}" method="POST">
-                            @csrf
-                            @method('PUT')
-                            <input type="hidden" name="status" value="confirmed">
-                            <button type="submit" class="btn btn-success">Konfirmasi Pemesanan</button>
-                        </form>
-                        <form action="{{ route('admin.pemesanans.update_status', $pemesanan->id_pemesanan) }}" method="POST">
-                            @csrf
-                            @method('PUT')
-                            <input type="hidden" name="status" value="checked_in">
-                            <button type="submit" class="btn btn-primary">Check-in</button>
-                        </form>
-                        <form action="{{ route('admin.pemesanans.update_status', $pemesanan->id_pemesanan) }}" method="POST">
-                            @csrf
-                            @method('PUT')
-                            <input type="hidden" name="status" value="checked_out">
-                            <button type="submit" class="btn btn-info">Check-out</button>
-                        </form>
-                        {{-- Tombol Edit (jika Anda mengaktifkan rute edit) --}}
-                        <a href="{{ route('admin.pemesanans.edit', $pemesanan->id_pemesanan) }}" class="btn btn-warning">Edit Detail</a>
-                        {{-- Tombol Hapus (jika Anda mengaktifkan rute destroy) --}}
+                    <div class="d-flex gap-2 flex-wrap">
+                        {{-- Tombol Konfirmasi Pemesanan --}}
+                        @if($pemesanan->status_pemesanan === 'pending')
+                            <form action="{{ route('admin.pemesanans.confirm', $pemesanan->id_pemesanan) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin mengkonfirmasi pemesanan ini?');">
+                                @csrf
+                                @method('PATCH')
+                                <button type="submit" class="btn btn-success"><i class="fas fa-check-circle me-1"></i> Terima Pesanan</button>
+                            </form>
+                        @else
+                            <button type="button" class="btn btn-secondary" disabled><i class="fas fa-check-circle me-1"></i> Terima Pesanan</button>
+                        @endif
+
+                        {{-- Tombol Check-in --}}
+                        @if($pemesanan->status_pemesanan === 'confirmed')
+                            <form action="{{ route('admin.pemesanans.checkin', $pemesanan->id_pemesanan) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin melakukan check-in pemesanan ini?');">
+                                @csrf
+                                @method('PATCH')
+                                <button type="submit" class="btn btn-primary"><i class="fas fa-sign-in-alt me-1"></i> Check-in</button>
+                            </form>
+                        @else
+                             <button type="button" class="btn btn-secondary" disabled><i class="fas fa-sign-in-alt me-1"></i> Check-in</button>
+                        @endif
+                        
+                        {{-- Tombol Edit --}}
+                        <a href="{{ route('admin.pemesanans.edit', $pemesanan->id_pemesanan) }}" class="btn btn-warning"><i class="fas fa-edit me-1"></i> Edit Detail</a>
+
+                        {{-- Tombol Hapus --}}
                         <form action="{{ route('admin.pemesanans.destroy', $pemesanan->id_pemesanan) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus pemesanan ini?');">
                             @csrf
                             @method('DELETE')
-                            <button type="submit" class="btn btn-danger">Hapus Pemesanan</button>
+                            <button type="submit" class="btn btn-danger"><i class="fas fa-trash-alt me-1"></i> Hapus Pemesanan</button>
                         </form>
                     </div>
                 </div>

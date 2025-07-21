@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manajemen Tipe Kamar - NginapKuy Admin</title>
+    <title>Manajemen Pengguna - NginapKuy Admin</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="{{ asset('css/admindashboard.css') }}" rel="stylesheet">
@@ -41,7 +41,7 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link {{ request()->routeIs('admin.tipe_kamars.*') ? 'active' : '' }}" aria-current="page" href="{{ route('admin.tipe_kamars.index') }}">
+                    <a class="nav-link {{ request()->routeIs('admin.tipe_kamars.*') ? 'active' : '' }}" href="{{ route('admin.tipe_kamars.index') }}">
                         <i class="fas fa-hotel me-2"></i> Manajemen Tipe Kamar
                     </a>
                 </li>
@@ -68,7 +68,7 @@
             </ul>
         </div>
 
-        {{-- Konten Utama Manajemen Tipe Kamar --}}
+        {{-- Konten Utama Manajemen Pengguna --}}
         <div class="main-content">
             @if (session('success'))
                 <div class="alert alert-success alert-dismissible fade show text-center" role="alert">
@@ -84,63 +84,54 @@
             @endif
 
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <h2 class="mb-0">Manajemen Tipe Kamar</h2>
-                <a href="{{ route('admin.tipe_kamars.create') }}" class="btn btn-primary">
-                    <i class="fas fa-plus-circle me-2"></i> Tambah Tipe Kamar Baru
-                </a>
+                <h2 class="mb-0">Manajemen Pengguna</h2>
+                <a href="{{ route('admin.users.create') }}" class="btn btn-primary">Tambah Pengguna Baru</a>
             </div>
 
             <div class="card p-4 shadow-sm">
                 <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-hover table-striped">
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Nama Tipe</th>
-                                    <th>Harga Per Malam</th>
-                                    <th>Deskripsi</th>
-                                    <th>URL Foto</th>
-                                    <th style="width: 120px;">Aksi</th> {{-- Tetapkan lebar untuk konsistensi --}}
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @forelse ($tipeKamars as $tipeKamar)
+                    @if ($users->isEmpty())
+                        <p class="text-center">Tidak ada pengguna yang terdaftar.</p>
+                    @else
+                        <div class="table-responsive">
+                            <table class="table table-hover table-striped">
+                                <thead>
                                     <tr>
-                                        <td>{{ $tipeKamar->id_tipe_kamar }}</td>
-                                        <td>{{ $tipeKamar->nama_tipe_kamar }}</td>
-                                        <td>Rp {{ number_format($tipeKamar->harga_per_malam, 2, ',', '.') }}</td>
-                                        <td>{{ $tipeKamar->deskripsi }}</td> {{-- DESKRIPSI SUDAH TIDAK TERPOTONG --}}
-                                        <td>
-                                            @if ($tipeKamar->foto_url)
-                                                <a href="{{ asset($tipeKamar->foto_url) }}" target="_blank">Lihat Foto</a>
-                                            @else
-                                                N/A
-                                            @endif
-                                        </td>
-                                        <td>
-                                            <div class="d-grid gap-1">
-                                                <a href="{{ route('admin.tipe_kamars.edit', $tipeKamar->id_tipe_kamar) }}" class="btn btn-sm btn-warning w-100" title="Edit Tipe Kamar">
-                                                    <i class="fas fa-edit"></i> Edit
+                                        <th>ID</th>
+                                        <th>Nama</th>
+                                        <th>Email</th>
+                                        <th>Peran</th>
+                                        <th>Terdaftar Sejak</th>
+                                        <th style="width: 150px;">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach ($users as $user)
+                                        <tr>
+                                            <td>{{ $user->id }}</td>
+                                            <td>{{ $user->name }}</td>
+                                            <td>{{ $user->email }}</td>
+                                            {{-- PERBAIKAN: Menggunakan $user->role->nama_role --}}
+                                            <td>{{ $user->role->nama_role ?? 'Tidak Ada Peran' }}</td>
+                                            <td>{{ \Carbon\Carbon::parse($user->created_at)->format('d M Y H:i') }}</td>
+                                            <td>
+                                                <a href="{{ route('admin.users.edit', $user->id) }}" class="btn btn-sm btn-warning me-1" title="Edit">
+                                                    <i class="fas fa-edit"></i>
                                                 </a>
-                                                <form action="{{ route('admin.tipe_kamars.destroy', $tipeKamar->id_tipe_kamar) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus tipe kamar ini? Ini akan juga menghapus kamar yang terkait!');">
+                                                <form action="{{ route('admin.users.destroy', $user->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Apakah Anda yakin ingin menghapus pengguna ini?');">
                                                     @csrf
                                                     @method('DELETE')
-                                                    <button type="submit" class="btn btn-sm btn-danger w-100" title="Hapus Tipe Kamar">
-                                                        <i class="fas fa-trash-alt"></i> Hapus
+                                                    <button type="submit" class="btn btn-sm btn-danger" title="Hapus">
+                                                        <i class="fas fa-trash-alt"></i>
                                                     </button>
                                                 </form>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="6" class="text-center">Tidak ada tipe kamar yang tersedia.</td>
-                                    </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
-                    </div>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    @endif
                 </div>
             </div>
 

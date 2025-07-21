@@ -10,6 +10,9 @@ use App\Http\Controllers\BookingController; // Untuk pemesanan
 use App\Http\Controllers\Admin\KamarController;
 use App\Http\Controllers\Admin\TipeKamarController;
 use App\Http\Controllers\Admin\PemesananController;
+use App\Http\Controllers\Admin\PembayaranController;
+use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\FasilitasController;
 
 // KARENA LoginController dan RegisterController ADA DI app/Http/Controllers/Auth/
 use App\Http\Controllers\Auth\LoginController;
@@ -39,6 +42,18 @@ Route::middleware('auth')->group(function () {
         Route::get('/dashboard', [DashboardAdminController::class, 'index'])->name('dashboard');
         Route::resource('kamars', KamarController::class);
         Route::resource('tipe_kamars', TipeKamarController::class);
-        Route::resource('pemesanans', PemesananController::class)->except(['create', 'store', 'edit', 'update']);
+
+        Route::resource('pemesanans', PemesananController::class);
+        Route::patch('pemesanans/{pemesanan}/checkin', [PemesananController::class, 'checkIn'])->name('pemesanans.checkin');
+        Route::patch('pemesanans/{pemesanan}/checkout', [PemesananController::class, 'checkout'])->name('pemesanans.checkout');
+        Route::patch('pemesanans/{pemesanan}/confirm', [PemesananController::class, 'confirm'])->name('pemesanans.confirm');
+        Route::get('pembayaran/{pemesanan}', [PembayaranController::class, 'show'])->name('pembayaran.show'); // PERUBAHAN NAMA RUTE
+        Route::post('pembayaran/{pemesanan}/process', [PembayaranController::class, 'process'])->name('pembayaran.process'); // PERUBAHAN NAMA RUTE
+        Route::get('riwayat-transaksi', [PembayaranController::class, 'history'])->name('riwayat.transaksi'); // <-- Rute baru
+        Route::resource('users', UserController::class); // <-- Tambahkan baris ini
+        Route::resource('fasilitas', FasilitasController::class);
+        Route::put('admin/fasilitas/{fasilitas}', [FasilitasController::class, 'update'])->name('admin.fasilitas.update');
+
+        
     });
 });

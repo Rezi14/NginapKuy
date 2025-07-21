@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit Tipe Kamar - NginapKuy Admin</title>
+    <title>Edit Pengguna - NginapKuy Admin</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="{{ asset('css/admindashboard.css') }}" rel="stylesheet">
@@ -46,7 +46,7 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link {{ request()->routeIs('admin.pemesanans.*') ? 'active' : '' }}" aria-current="page" href="{{ route('admin.pemesanans.index') }}">
+                    <a class="nav-link {{ request()->routeIs('admin.pemesanans.*') ? 'active' : '' }}" href="{{ route('admin.pemesanans.index') }}">
                         <i class="fas fa-receipt me-2"></i> Manajemen Pemesanan
                     </a>
                 </li>
@@ -56,25 +56,23 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link {{ request()->routeIs('admin.fasilitas.*') ? 'active' : '' }}" href="{{ route('admin.fasilitas.index') }}">
+                    <a class="nav-link" href="#">
                         <i class="fas fa-spa me-2"></i> Manajemen Fasilitas
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link {{ request()->routeIs('admin.riwayat.transaksi') ? 'active' : '' }}" href="{{ route('admin.riwayat.transaksi') }}">
-                        <i class="fas fa-history me-2"></i> Riwayat Transaksi
+                    <a class="nav-link {{ request()->routeIs('admin.fasilitas.*') ? 'active' : '' }}" href="{{ route('admin.fasilitas.index') }}">
+                        <i class="fas fa-spa me-2"></i> Manajemen Fasilitas
                     </a>
                 </li>
             </ul>
         </div>
 
-        {{-- Konten Utama Edit Tipe Kamar --}}
+        {{-- Konten Utama Edit Pengguna --}}
         <div class="main-content">
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <h2 class="mb-0">Edit Tipe Kamar: {{ $tipeKamar->nama_tipe_kamar }}</h2>
-                <a href="{{ route('admin.tipe_kamars.index') }}" class="btn btn-secondary">
-                    <i class="fas fa-arrow-left me-2"></i> Kembali ke Daftar Tipe Kamar
-                </a>
+                <h2 class="mb-0">Edit Pengguna: {{ $user->name }}</h2>
+                <a href="{{ route('admin.users.index') }}" class="btn btn-secondary">Kembali ke Daftar Pengguna</a>
             </div>
 
             <div class="card p-4 shadow-sm">
@@ -89,27 +87,36 @@
                         </div>
                     @endif
 
-                    <form action="{{ route('admin.tipe_kamars.update', $tipeKamar->id_tipe_kamar) }}" method="POST">
+                    <form action="{{ route('admin.users.update', $user->id) }}" method="POST">
                         @csrf
-                        @method('PUT')
+                        @method('PUT') {{-- Gunakan metode PUT untuk update --}}
+
                         <div class="mb-3">
-                            <label for="nama_tipe_kamar" class="form-label">Nama Tipe Kamar</label>
-                            <input type="text" class="form-control" id="nama_tipe_kamar" name="nama_tipe_kamar" value="{{ old('nama_tipe_kamar', $tipeKamar->nama_tipe_kamar) }}" required>
+                            <label for="name" class="form-label">Nama Pengguna</label>
+                            <input type="text" class="form-control" id="name" name="name" value="{{ old('name', $user->name) }}" required>
                         </div>
                         <div class="mb-3">
-                            <label for="harga_per_malam" class="form-label">Harga Per Malam</label>
-                            <input type="number" step="0.01" class="form-control" id="harga_per_malam" name="harga_per_malam" value="{{ old('harga_per_malam', $tipeKamar->harga_per_malam) }}" required>
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" name="email" value="{{ old('email', $user->email) }}" required>
                         </div>
                         <div class="mb-3">
-                            <label for="deskripsi" class="form-label">Deskripsi</label>
-                            <textarea class="form-control" id="deskripsi" name="deskripsi" rows="3">{{ old('deskripsi', $tipeKamar->deskripsi) }}</textarea>
+                            <label for="password" class="form-label">Password Baru (kosongkan jika tidak ingin mengubah)</label>
+                            <input type="password" class="form-control" id="password" name="password">
                         </div>
                         <div class="mb-3">
-                            <label for="foto_url" class="form-label">URL Foto (misal: /img/standard.jpg)</label>
-                            <input type="text" class="form-control" id="foto_url" name="foto_url" value="{{ old('foto_url', $tipeKamar->foto_url) }}">
-                            <div class="form-text">Masukkan path relatif ke foto tipe kamar.</div>
+                            <label for="password_confirmation" class="form-label">Konfirmasi Password Baru</label>
+                            <input type="password" class="form-control" id="password_confirmation" name="password_confirmation">
                         </div>
-                        <button type="submit" class="btn btn-primary">Perbarui Tipe Kamar</button>
+                        <div class="mb-3">
+                            <label for="role_id" class="form-label">Peran</label>
+                            <select class="form-select" id="role_id" name="role_id" required>
+                                <option value="">Pilih Peran</option>
+                                @foreach ($roles as $role)
+                                    <option value="{{ $role->id }}" {{ old('role_id', $user->role_id) == $role->id ? 'selected' : '' }}>{{ $role->nama_role }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Perbarui Pengguna</button>
                     </form>
                 </div>
             </div>

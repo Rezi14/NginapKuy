@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manajemen Tipe Kamar - NginapKuy Admin</title>
+    <title>Riwayat Transaksi - NginapKuy Admin</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="{{ asset('css/admindashboard.css') }}" rel="stylesheet">
@@ -41,7 +41,7 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link {{ request()->routeIs('admin.tipe_kamars.*') ? 'active' : '' }}" aria-current="page" href="{{ route('admin.tipe_kamars.index') }}">
+                    <a class="nav-link {{ request()->routeIs('admin.tipe_kamars.*') ? 'active' : '' }}" href="{{ route('admin.tipe_kamars.index') }}">
                         <i class="fas fa-hotel me-2"></i> Manajemen Tipe Kamar
                     </a>
                 </li>
@@ -68,7 +68,7 @@
             </ul>
         </div>
 
-        {{-- Konten Utama Manajemen Tipe Kamar --}}
+        {{-- Konten Utama Riwayat Transaksi --}}
         <div class="main-content">
             @if (session('success'))
                 <div class="alert alert-success alert-dismissible fade show text-center" role="alert">
@@ -84,63 +84,69 @@
             @endif
 
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <h2 class="mb-0">Manajemen Tipe Kamar</h2>
-                <a href="{{ route('admin.tipe_kamars.create') }}" class="btn btn-primary">
-                    <i class="fas fa-plus-circle me-2"></i> Tambah Tipe Kamar Baru
-                </a>
+                <h2 class="mb-0">Riwayat Transaksi</h2>
             </div>
 
             <div class="card p-4 shadow-sm">
                 <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-hover table-striped">
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Nama Tipe</th>
-                                    <th>Harga Per Malam</th>
-                                    <th>Deskripsi</th>
-                                    <th>URL Foto</th>
-                                    <th style="width: 120px;">Aksi</th> {{-- Tetapkan lebar untuk konsistensi --}}
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @forelse ($tipeKamars as $tipeKamar)
+                    @if ($riwayatTransaksi->isEmpty())
+                        <p class="text-center">Tidak ada riwayat transaksi yang tersedia.</p>
+                    @else
+                        <div class="table-responsive">
+                            <table class="table table-hover table-striped">
+                                <thead>
                                     <tr>
-                                        <td>{{ $tipeKamar->id_tipe_kamar }}</td>
-                                        <td>{{ $tipeKamar->nama_tipe_kamar }}</td>
-                                        <td>Rp {{ number_format($tipeKamar->harga_per_malam, 2, ',', '.') }}</td>
-                                        <td>{{ $tipeKamar->deskripsi }}</td> {{-- DESKRIPSI SUDAH TIDAK TERPOTONG --}}
-                                        <td>
-                                            @if ($tipeKamar->foto_url)
-                                                <a href="{{ asset($tipeKamar->foto_url) }}" target="_blank">Lihat Foto</a>
-                                            @else
-                                                N/A
-                                            @endif
-                                        </td>
-                                        <td>
-                                            <div class="d-grid gap-1">
-                                                <a href="{{ route('admin.tipe_kamars.edit', $tipeKamar->id_tipe_kamar) }}" class="btn btn-sm btn-warning w-100" title="Edit Tipe Kamar">
-                                                    <i class="fas fa-edit"></i> Edit
+                                        <th>ID Pemesanan</th>
+                                        <th>Pelanggan</th>
+                                        <th>Kamar</th>
+                                        <th>Tipe Kamar</th>
+                                        <th>Check-in</th>
+                                        <th>Check-out</th>
+                                        <th>Status</th>
+                                        <th>Total Harga</th>
+                                        <th>Fasilitas Tambahan</th>
+                                        <th>Tanggal Selesai</th> {{-- Tambah kolom tanggal selesai --}}
+                                        <th style="width: 80px;">Aksi</th> {{-- Opsi aksi jika diperlukan --}}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach ($riwayatTransaksi as $pemesanan)
+                                        <tr>
+                                            <td>{{ $pemesanan->id_pemesanan }}</td>
+                                            <td>{{ $pemesanan->user->name ?? 'N/A' }}</td>
+                                            <td>{{ $pemesanan->kamar->nomor_kamar ?? 'N/A' }}</td>
+                                            <td>{{ $pemesanan->kamar->tipeKamar->nama_tipe_kamar ?? 'N/A' }}</td>
+                                            <td>{{ \Carbon\Carbon::parse($pemesanan->check_in_date)->format('d M Y') }}</td>
+                                            <td>{{ \Carbon\Carbon::parse($pemesanan->check_out_date)->format('d M Y') }}</td>
+                                            <td>
+                                                <span class="badge {{ $pemesanan->status_pemesanan == 'paid' ? 'bg-dark' : ($pemesanan->status_pemesanan == 'cancelled' ? 'bg-danger' : 'bg-secondary') }}">
+                                                    {{ ucfirst(str_replace('_', ' ', $pemesanan->status_pemesanan)) }}
+                                                </span>
+                                            </td>
+                                            <td>Rp {{ number_format($pemesanan->total_harga, 2, ',', '.') }}</td>
+                                            <td>
+                                                @if ($pemesanan->fasilitas->isNotEmpty())
+                                                    <ul class="list-unstyled mb-0">
+                                                        @foreach ($pemesanan->fasilitas as $fasilitas)
+                                                            <li>- {{ $fasilitas->nama_fasilitas }}</li>
+                                                        @endforeach
+                                                    </ul>
+                                                @else
+                                                    Tidak Ada
+                                                @endif
+                                            </td>
+                                            <td>{{ \Carbon\Carbon::parse($pemesanan->updated_at)->format('d M Y H:i:s') }}</td> {{-- Tanggal update terakhir sebagai indikasi selesai --}}
+                                            <td>
+                                                <a href="{{ route('admin.pemesanans.show', $pemesanan->id_pemesanan) }}" class="btn btn-sm btn-info" title="Lihat Detail">
+                                                    <i class="fas fa-eye"></i>
                                                 </a>
-                                                <form action="{{ route('admin.tipe_kamars.destroy', $tipeKamar->id_tipe_kamar) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus tipe kamar ini? Ini akan juga menghapus kamar yang terkait!');">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="btn btn-sm btn-danger w-100" title="Hapus Tipe Kamar">
-                                                        <i class="fas fa-trash-alt"></i> Hapus
-                                                    </button>
-                                                </form>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="6" class="text-center">Tidak ada tipe kamar yang tersedia.</td>
-                                    </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
-                    </div>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    @endif
                 </div>
             </div>
 

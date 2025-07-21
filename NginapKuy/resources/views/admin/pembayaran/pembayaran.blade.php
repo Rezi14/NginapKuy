@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manajemen Tipe Kamar - NginapKuy Admin</title>
+    <title>Pembayaran Pemesanan #{{ $pemesanan->id_pemesanan }} - NginapKuy Admin</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="{{ asset('css/admindashboard.css') }}" rel="stylesheet">
@@ -41,12 +41,12 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link {{ request()->routeIs('admin.tipe_kamars.*') ? 'active' : '' }}" aria-current="page" href="{{ route('admin.tipe_kamars.index') }}">
+                    <a class="nav-link {{ request()->routeIs('admin.tipe_kamars.*') ? 'active' : '' }}" href="{{ route('admin.tipe_kamars.index') }}">
                         <i class="fas fa-hotel me-2"></i> Manajemen Tipe Kamar
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link {{ request()->routeIs('admin.pemesanans.*') ? 'active' : '' }}" href="{{ route('admin.pemesanans.index') }}">
+                    <a class="nav-link {{ request()->routeIs('admin.pemesanans.*') ? 'active' : '' }}" aria-current="page" href="{{ route('admin.pemesanans.index') }}">
                         <i class="fas fa-receipt me-2"></i> Manajemen Pemesanan
                     </a>
                 </li>
@@ -68,7 +68,7 @@
             </ul>
         </div>
 
-        {{-- Konten Utama Manajemen Tipe Kamar --}}
+        {{-- Konten Utama Pembayaran --}}
         <div class="main-content">
             @if (session('success'))
                 <div class="alert alert-success alert-dismissible fade show text-center" role="alert">
@@ -84,66 +84,73 @@
             @endif
 
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <h2 class="mb-0">Manajemen Tipe Kamar</h2>
-                <a href="{{ route('admin.tipe_kamars.create') }}" class="btn btn-primary">
-                    <i class="fas fa-plus-circle me-2"></i> Tambah Tipe Kamar Baru
+                <h2 class="mb-0">Pembayaran Pemesanan #{{ $pemesanan->id_pemesanan }}</h2>
+                <a href="{{ route('admin.pemesanans.index') }}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left me-2"></i> Kembali ke Daftar Pemesanan
                 </a>
             </div>
 
             <div class="card p-4 shadow-sm">
                 <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-hover table-striped">
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Nama Tipe</th>
-                                    <th>Harga Per Malam</th>
-                                    <th>Deskripsi</th>
-                                    <th>URL Foto</th>
-                                    <th style="width: 120px;">Aksi</th> {{-- Tetapkan lebar untuk konsistensi --}}
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @forelse ($tipeKamars as $tipeKamar)
-                                    <tr>
-                                        <td>{{ $tipeKamar->id_tipe_kamar }}</td>
-                                        <td>{{ $tipeKamar->nama_tipe_kamar }}</td>
-                                        <td>Rp {{ number_format($tipeKamar->harga_per_malam, 2, ',', '.') }}</td>
-                                        <td>{{ $tipeKamar->deskripsi }}</td> {{-- DESKRIPSI SUDAH TIDAK TERPOTONG --}}
-                                        <td>
-                                            @if ($tipeKamar->foto_url)
-                                                <a href="{{ asset($tipeKamar->foto_url) }}" target="_blank">Lihat Foto</a>
-                                            @else
-                                                N/A
-                                            @endif
-                                        </td>
-                                        <td>
-                                            <div class="d-grid gap-1">
-                                                <a href="{{ route('admin.tipe_kamars.edit', $tipeKamar->id_tipe_kamar) }}" class="btn btn-sm btn-warning w-100" title="Edit Tipe Kamar">
-                                                    <i class="fas fa-edit"></i> Edit
-                                                </a>
-                                                <form action="{{ route('admin.tipe_kamars.destroy', $tipeKamar->id_tipe_kamar) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus tipe kamar ini? Ini akan juga menghapus kamar yang terkait!');">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="btn btn-sm btn-danger w-100" title="Hapus Tipe Kamar">
-                                                        <i class="fas fa-trash-alt"></i> Hapus
-                                                    </button>
-                                                </form>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="6" class="text-center">Tidak ada tipe kamar yang tersedia.</td>
-                                    </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
+                    <h5 class="card-title mb-4">Detail Pembayaran</h5>
+
+                    <div class="row mb-3">
+                        <div class="col-md-4"><strong>Pelanggan:</strong></div>
+                        <div class="col-md-8">{{ $pemesanan->user->name ?? 'N/A' }}</div>
                     </div>
+                    <div class="row mb-3">
+                        <div class="col-md-4"><strong>Kamar:</strong></div>
+                        <div class="col-md-8">{{ $pemesanan->kamar->nomor_kamar ?? 'N/A' }} (Tipe: {{ $pemesanan->kamar->tipeKamar->nama_tipe_kamar ?? 'N/A' }})</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-4"><strong>Durasi Menginap:</strong></div>
+                        <div class="col-md-8">{{ \Carbon\Carbon::parse($pemesanan->check_in_date)->format('d M Y') }} s/d {{ \Carbon\Carbon::parse($pemesanan->check_out_date)->format('d M Y') }}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-4"><strong>Fasilitas Tambahan:</strong></div>
+                        <div class="col-md-8">
+                            @if ($pemesanan->fasilitas->isNotEmpty())
+                                <ul class="list-unstyled mb-0">
+                                    @foreach ($pemesanan->fasilitas as $fasilitas)
+                                        <li>- {{ $fasilitas->nama_fasilitas }} (Rp {{ number_format($fasilitas->biaya_tambahan, 0, ',', '.') }})</li>
+                                    @endforeach
+                                </ul>
+                            @else
+                                Tidak Ada
+                            @endif
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row mb-4">
+                        <div class="col-md-4"><h4>Total yang Harus Dibayar:</h4></div>
+                        <div class="col-md-8"><h4>Rp {{ number_format($pemesanan->total_harga, 2, ',', '.') }}</h4></div>
+                    </div>
+
+                    <h5 class="mb-3">Metode Pembayaran</h5>
+                    <form action="{{ route('admin.pembayaran.process', $pemesanan->id_pemesanan) }}" method="POST">
+                        @csrf
+                        <div class="form-group mb-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="payment_method" id="paymentQris" value="qris" required>
+                                <label class="form-check-label" for="paymentQris">
+                                    QRIS (QR Code Indonesian Standard)
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="payment_method" id="paymentCash" value="tunai" required>
+                                <label class="form-check-label" for="paymentCash">
+                                    Tunai
+                                </label>
+                            </div>
+                            @error('payment_method')
+                                <div class="text-danger mt-2">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-lg"><i class="fas fa-money-bill-wave me-2"></i> Konfirmasi Pembayaran</button>
+                    </form>
                 </div>
             </div>
-
         </div>
     </div>
 

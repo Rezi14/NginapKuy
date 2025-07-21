@@ -51,17 +51,17 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">
+                    <a class="nav-link {{ request()->routeIs('admin.users.*') ? 'active' : '' }}" href="{{ route('admin.users.index') }}">
                         <i class="fas fa-users me-2"></i> Manajemen Pengguna
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">
+                    <a class="nav-link {{ request()->routeIs('admin.fasilitas.*') ? 'active' : '' }}" href="{{ route('admin.fasilitas.index') }}">
                         <i class="fas fa-spa me-2"></i> Manajemen Fasilitas
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">
+                    <a class="nav-link {{ request()->routeIs('admin.riwayat.transaksi') ? 'active' : '' }}" href="{{ route('admin.riwayat.transaksi') }}">
                         <i class="fas fa-history me-2"></i> Riwayat Transaksi
                     </a>
                 </li>
@@ -165,12 +165,18 @@
                                             <td>Rp {{ number_format($pemesanan->total_harga, 2, ',', '.') }}</td>
                                             <td>
                                                 <div class="d-flex gap-1">
-                                                    <a href="#" class="btn btn-sm btn-info" title="Tambah Fasilitas">
+                                                    {{-- Tombol Tambah Fasilitas (mengarah ke halaman edit) --}}
+                                                    <a href="{{ route('admin.pemesanans.edit', $pemesanan->id_pemesanan) }}" class="btn btn-sm btn-info" title="Edit Pemesanan (Tambah Fasilitas)">
                                                         <i class="fas fa-plus"></i> Fasilitas
                                                     </a>
-                                                    <a href="#" class="btn btn-sm btn-success" title="Checkout Pelanggan">
-                                                        <i class="fas fa-check"></i> Checkout
-                                                    </a>
+                                                    {{-- Tombol Checkout Pelanggan --}}
+                                                    <form action="{{ route('admin.pemesanans.checkout', $pemesanan->id_pemesanan) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin melakukan checkout pemesanan ini?');">
+                                                        @csrf
+                                                        @method('PATCH')
+                                                        <button type="submit" class="btn btn-sm btn-success" title="Checkout Pelanggan">
+                                                            <i class="fas fa-check"></i> Checkout
+                                                        </button>
+                                                    </form>
                                                 </div>
                                             </td>
                                         </tr>

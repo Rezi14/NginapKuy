@@ -51,17 +51,17 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link {{ request()->routeIs('admin.users.*') ? 'active' : '' }}" href="#">
+                    <a class="nav-link {{ request()->routeIs('admin.users.*') ? 'active' : '' }}" href="{{ route('admin.users.index') }}">
                         <i class="fas fa-users me-2"></i> Manajemen Pengguna
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link {{ request()->routeIs('admin.fasilitas.*') ? 'active' : '' }}" href="#">
+                    <a class="nav-link {{ request()->routeIs('admin.fasilitas.*') ? 'active' : '' }}" href="{{ route('admin.fasilitas.index') }}">
                         <i class="fas fa-spa me-2"></i> Manajemen Fasilitas
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link {{ request()->routeIs('admin.transaksi.*') ? 'active' : '' }}" href="#">
+                    <a class="nav-link {{ request()->routeIs('admin.riwayat.transaksi') ? 'active' : '' }}" href="{{ route('admin.riwayat.transaksi') }}">
                         <i class="fas fa-history me-2"></i> Riwayat Transaksi
                     </a>
                 </li>
@@ -86,9 +86,9 @@
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h2 class="mb-0">Manajemen Pemesanan</h2>
                 {{-- Tombol Tambah Pemesanan Baru (opsional, jika admin bisa membuat pemesanan manual) --}}
-                {{-- <a href="{{ route('admin.pemesanans.create') }}" class="btn btn-primary">
+                <a href="{{ route('admin.pemesanans.create') }}" class="btn btn-primary">
                     <i class="fas fa-plus-circle me-2"></i> Tambah Pemesanan Baru
-                </a> --}}
+                </a>
             </div>
 
             <div class="card p-4 shadow-sm">
@@ -137,17 +137,17 @@
                                         </td>
                                         <td>
                                             <div class="d-grid gap-1"> {{-- Untuk tombol aksi yang simetris --}}
-                                                <a href="{{ route('admin.pemesanans.show', $pemesanan->id_pemesanan) }}" class="btn btn-sm btn-info" title="Lihat Detail">
+                                                <a href="{{ route('admin.pemesanans.show', $pemesanan->id_pemesanan) }}" class="btn btn-sm btn-info w-100" title="Lihat Detail">
                                                     <i class="fas fa-eye"></i> Detail
                                                 </a>
-                                                {{-- Contoh tombol aksi lain, bisa diaktifkan jika Anda menambahkan method di controller --}}
-                                                {{-- <a href="{{ route('admin.pemesanans.edit', $pemesanan->id_pemesanan) }}" class="btn btn-sm btn-warning" title="Edit Pemesanan">
+                                                {{-- <a href="{{ route('admin.pemesanans.edit', $pemesanan->id_pemesanan) }}" class="btn btn-sm btn-warning w-100" title="Edit Pemesanan">
                                                     <i class="fas fa-edit"></i> Edit
-                                                </a>
-                                                <form action="{{ route('admin.pemesanans.destroy', $pemesanan->id_pemesanan) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus pemesanan ini?');">
+                                                </a> --}}
+                                                {{-- Tambahkan kelas 'w-100' pada form agar lebarnya konsisten --}}
+                                                {{-- <form action="{{ route('admin.pemesanans.destroy', $pemesanan->id_pemesanan) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus pemesanan ini?');" class="w-100">
                                                     @csrf
                                                     @method('DELETE')
-                                                    <button type="submit" class="btn btn-sm btn-danger" title="Hapus Pemesanan">
+                                                    <button type="submit" class="btn btn-sm btn-danger w-100" title="Hapus Pemesanan">
                                                         <i class="fas fa-trash-alt"></i> Hapus
                                                     </button>
                                                 </form> --}}
