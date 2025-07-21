@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -13,12 +13,11 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call([
-            RoleSeeder::class, // Panggil RoleSeeder
-            TipeKamarSeeder::class, // Tambahkan baris ini
+            RoleSeeder::class,
+            TipeKamarSeeder::class,
             KamarSeeder::class,
             AdminUserSeeder::class,
-            // UserSeeder::class, // Jika Anda memiliki UserSeeder
+            FasilitasSeeder::class, // Tambahkan baris ini
         ]);
     }
-    
 }

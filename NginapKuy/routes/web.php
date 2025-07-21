@@ -7,6 +7,9 @@ use App\Http\Controllers\Controller;
 use App\Http\Controllers\Admin\DashboardAdminController; // Pastikan ini diimport
 use App\Http\Controllers\DashboardController; // Dashboard umum
 use App\Http\Controllers\BookingController; // Untuk pemesanan
+use App\Http\Controllers\Admin\KamarController;
+use App\Http\Controllers\Admin\TipeKamarController;
+use App\Http\Controllers\Admin\PemesananController;
 
 // KARENA LoginController dan RegisterController ADA DI app/Http/Controllers/Auth/
 use App\Http\Controllers\Auth\LoginController;
@@ -34,5 +37,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/pesan-kamar', [BookingController::class, 'store'])->name('booking.store');
     Route::middleware(['auth', 'role'])->prefix('admin')->name('admin.')->group(function () {
         Route::get('/dashboard', [DashboardAdminController::class, 'index'])->name('dashboard');
+        Route::resource('kamars', KamarController::class);
+        Route::resource('tipe_kamars', TipeKamarController::class);
+        Route::resource('pemesanans', PemesananController::class)->except(['create', 'store', 'edit', 'update']);
     });
 });

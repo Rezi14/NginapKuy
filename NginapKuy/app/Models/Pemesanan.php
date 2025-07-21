@@ -9,25 +9,9 @@ class Pemesanan extends Model
 {
     use HasFactory;
 
-    /**
-     * Nama tabel yang terkait dengan model.
-     * Defaultnya 'pemesanans', jadi ini opsional.
-     * @var string
-     */
     protected $table = 'pemesanans';
-
-    /**
-     * Kunci primer model.
-     * Defaultnya 'id', jadi ini opsional.
-     * @var string
-     */
     protected $primaryKey = 'id_pemesanan';
 
-    /**
-     * Atribut yang dapat diisi secara massal.
-     *
-     * @var array<int, string>
-     */
     protected $fillable = [
         'user_id',
         'kamar_id',
@@ -38,36 +22,26 @@ class Pemesanan extends Model
         'status_pemesanan',
     ];
 
-    /**
-     * Atribut yang harus di-cast ke tipe data asli.
-     *
-     * @var array<string, string>
-     */
     protected $casts = [
-        'check_in_date' => 'date', // Mengubah ke objek Carbon Date
-        'check_out_date' => 'date', // Mengubah ke objek Carbon Date
-        'total_harga' => 'decimal:2', // Pastikan format desimal
+        'check_in_date' => 'date',
+        'check_out_date' => 'date',
+        'total_harga' => 'decimal:2',
     ];
 
-    /**
-     * Definisikan relasi 'belongsTo' dengan model User.
-     * Sebuah pemesanan 'milik' satu user.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
     public function user()
     {
-        return $this->belongsTo(User::class, 'user_id', 'id'); // Sesuaikan 'id' jika primary key User bukan 'id'
+        return $this->belongsTo(User::class, 'user_id', 'id');
     }
 
-    /**
-     * Definisikan relasi 'belongsTo' dengan model Kamar.
-     * Sebuah pemesanan 'milik' satu kamar.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
     public function kamar()
     {
-        return $this->belongsTo(Kamar::class, 'kamar_id', 'id_kamar'); // Sesuaikan 'id_kamar' jika primary key Kamar bukan 'id_kamar'
+        return $this->belongsTo(Kamar::class, 'kamar_id', 'id_kamar');
+    }
+
+    // Relasi baru untuk fasilitas
+    public function fasilitas()
+    {
+        return $this->belongsToMany(Fasilitas::class, 'pemesanan_fasilitas', 'pemesanan_id', 'fasilitas_id')
+                    ->withTimestamps();
     }
 }

@@ -2,72 +2,62 @@
 
 namespace App\Http\Controllers;
 
-// UBAH BARIS INI:
-use Illuminate\Routing\Controller; // Meng-extend langsung kelas Controller dari framework Laravel
-
+use Illuminate\Routing\Controller;
 use Illuminate\Http\Request;
-use App\Models\Kamar; // Import model Kamar
-use App\Models\Pemesanan; // Import model Pemesanan
-use Illuminate\Support\Facades\Auth; // Import untuk mendapatkan user yang sedang login
+use App\Models\Kamar;
+use App\Models\Pemesanan;
+use App\Models\Fasilitas; // Import model Fasilitas baru
+use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon; // Pastikan Carbon diimpor
 
-class BookingController extends Controller // Pastikan tetap extends Controller
+class BookingController extends Controller
 {
-    // Tambahkan middleware 'auth' agar hanya user yang login bisa mengakses ini
     public function __construct()
     {
         $this->middleware('auth');
     }
 
-    /**
-     * Menampilkan formulir pemesanan untuk kamar tertentu.
-     * Menggunakan Route Model Binding untuk Kamar.
-     *
-     * @param  \App\Models\Kamar  $kamar
-     * @return \Illuminate\View\View|\Illuminate\Http\RedirectResponse
-     */
     public function showBookingForm(Kamar $kamar)
     {
-        // Pastikan relasi tipeKamar dimuat
         $kamar->load('tipeKamar');
+        $fasilitasTersedia = Fasilitas::all(); // Ambil semua fasilitas yang tersedia
 
-        // Mengirim objek kamar ke view
-        return view('booking', compact('kamar'));
+        return view('booking', compact('kamar', 'fasilitasTersedia')); // Kirim fasilitas ke view
     }
 
-    /**
-     * Memproses dan menyimpan data pemesanan kamar.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\RedirectResponse
-     */
     public function store(Request $request)
     {
-        // 1. Validasi Data Input
         $request->validate([
             'kamar_id' => 'required|exists:kamars,id_kamar',
             'check_in_date' => 'required|date|after_or_equal:today',
             'check_out_date' => 'required|date|after:check_in_date',
             'jumlah_tamu' => 'required|integer|min:1',
+            'fasilitas_ids' => 'nullable|array', // Validasi fasilitas yang dipilih (array opsional)
+            'fasilitas_ids.*' => 'exists:fasilitas,id_fasilitas', // Pastikan setiap ID fasilitas ada di tabel fasilitas
         ]);
 
-        // 2. Ambil informasi kamar yang dipesan
         $kamar = Kamar::findOrFail($request->kamar_id);
         $kamar->load('tipeKamar');
 
-        // 3. Hitung Durasi Menginap
-        $checkIn = \Carbon\Carbon::parse($request->check_in_date);
-        $checkOut = \Carbon\Carbon::parse($request->check_out_date);
+        $checkIn = Carbon::parse($request->check_in_date);
+        $checkOut = Carbon::parse($request->check_out_date);
         $durasiMenginap = $checkIn->diffInDays($checkOut);
         if ($durasiMenginap == 0) {
             $durasiMenginap = 1;
         }
 
-        // 4. Hitung Total Harga
         $hargaPerMalam = $kamar->tipeKamar->harga_per_malam;
         $totalHarga = $hargaPerMalam * $durasiMenginap;
 
-        // 5. Buat Entri Pemesanan Baru
-        Pemesanan::create([
+        // Hitung biaya tambahan fasilitas
+        if ($request->has('fasilitas_ids') && is_array($request->fasilitas_ids)) {
+            $fasilitasDipilih = Fasilitas::whereIn('id_fasilitas', $request->fasilitas_ids)->get();
+            foreach ($fasilitasDipilih as $fasilitas) {
+                $totalHarga += $fasilitas->biaya_tambahan;
+            }
+        }
+
+        $pemesanan = Pemesanan::create([
             'user_id' => Auth::id(),
             'kamar_id' => $kamar->id_kamar,
             'check_in_date' => $request->check_in_date,
@@ -77,7 +67,11 @@ class BookingController extends Controller // Pastikan tetap extends Controller
             'status_pemesanan' => 'pending',
         ]);
 
-        // 6. Redirect atau Berikan Respon
+        // Lampirkan fasilitas yang dipilih ke pemesanan
+        if ($request->has('fasilitas_ids') && is_array($request->fasilitas_ids)) {
+            $pemesanan->fasilitas()->attach($request->fasilitas_ids);
+        }
+
         return redirect()->route('dashboard')->with('success', 'Pemesanan kamar berhasil dibuat! Total harga: Rp ' . number_format($totalHarga, 2, ',', '.'));
     }
 }
