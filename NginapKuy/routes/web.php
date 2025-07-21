@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Controller;
 // KARENA AdminController, DashboardController, BookingController ADA DI app/Http/Controllers/
-use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\Admin\DashboardAdminController; // Pastikan ini diimport
 use App\Http\Controllers\DashboardController; // Dashboard umum
 use App\Http\Controllers\BookingController; // Untuk pemesanan
 
@@ -32,15 +32,7 @@ Route::middleware('auth')->group(function () {
     // Rute Pemesanan Kamar
     Route::get('/pesan-kamar/{kamar}', [BookingController::class, 'showBookingForm'])->name('booking.create');
     Route::post('/pesan-kamar', [BookingController::class, 'store'])->name('booking.store');
-
-    // >>> Rute Dashboard Admin (TANPA PREFIX /ADMIN/) <<<
-    // URL: /dashboardadmin
-    // Nama Rute: dashboardadmin
-    // Middleware 'admin' akan memastikan hanya user dengan role 'admin' yang bisa mengakses
-    Route::middleware('admin')->prefix('admin')->name('admin.')->group(function () {
-        // Rute Dashboard Admin
-        Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard'); // Menggunakan alias
-        // Tambahkan rute manajemen admin lainnya di sini jika diperlukan
-        // Route::get('/users', [Admin\UserController::class, 'index'])->name('users.index');
+    Route::middleware(['auth', 'role'])->prefix('admin')->name('admin.')->group(function () {
+        Route::get('/dashboard', [DashboardAdminController::class, 'index'])->name('dashboard');
     });
 });
