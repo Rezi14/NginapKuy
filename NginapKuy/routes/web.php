@@ -20,7 +20,7 @@ use App\Http\Controllers\Auth\RegisterController;
 
 
 // --- Rute Umum (BISA DIAKSES TANPA LOGIN) ---
-Route::get('/', [DashboardController::class, 'index'])->name('home');
+Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
 
@@ -52,8 +52,8 @@ Route::middleware('auth')->group(function () {
         Route::get('riwayat-transaksi', [PembayaranController::class, 'history'])->name('riwayat.transaksi'); // <-- Rute baru
         Route::resource('users', UserController::class); // <-- Tambahkan baris ini
         Route::resource('fasilitas', FasilitasController::class);
-        Route::put('admin/fasilitas/{fasilitas}', [FasilitasController::class, 'update'])->name('admin.fasilitas.update');
+        // Route::put('admin/fasilitas/{fasilitas}', [FasilitasController::class, 'update'])->name('admin.fasilitas.update');
 
-        
+
     });
 });

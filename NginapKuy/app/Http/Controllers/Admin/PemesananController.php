@@ -194,6 +194,22 @@ class PemesananController extends Controller
         }
     }
 
+
+    public function checkIn(Pemesanan $pemesanan)
+    {
+        try {
+            if ($pemesanan->status_pemesanan === 'confirmed') {
+                $pemesanan->status_pemesanan = 'checked_in';
+                $pemesanan->save();
+                return redirect()->back()->with('success', 'Pemesanan berhasil di-check in!');
+            } else {
+                return redirect()->back()->with('error', 'Pemesanan tidak dapat di-check in karena statusnya bukan "Confirmed".');
+            }
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Terjadi kesalahan saat melakukan check in: ' . $e->getMessage());
+        }
+    }
+
     /**
      * Mengubah status pemesanan menjadi 'checked_out' dan MENGARAHKAN KE HALAMAN PEMBAYARAN.
      */

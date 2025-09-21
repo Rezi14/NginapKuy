@@ -160,7 +160,7 @@
                         @endif
 
                         {{-- Tombol Check-in --}}
-                        @if($pemesanan->status_pemesanan === 'confirmed')
+                        @if($pemesanan->status_pemesanan === 'checked_in')
                             <form action="{{ route('admin.pemesanans.checkin', $pemesanan->id_pemesanan) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin melakukan check-in pemesanan ini?');">
                                 @csrf
                                 @method('PATCH')
@@ -169,7 +169,7 @@
                         @else
                              <button type="button" class="btn btn-secondary" disabled><i class="fas fa-sign-in-alt me-1"></i> Check-in</button>
                         @endif
-                        
+
                         {{-- Tombol Edit --}}
                         <a href="{{ route('admin.pemesanans.edit', $pemesanan->id_pemesanan) }}" class="btn btn-warning"><i class="fas fa-edit me-1"></i> Edit Detail</a>
 

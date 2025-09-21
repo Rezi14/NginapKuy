@@ -155,9 +155,9 @@
                             @foreach ($fasilitas as $item)
                                 <div class="form-check form-check-inline">
                                     {{-- Tambahkan data-biaya-tambahan untuk JavaScript --}}
-                                    <input class="form-check-input" type="checkbox" name="fasilitas_tambahan[]" id="fasilitas_{{ $item->id }}" value="{{ $item->id }}"
+                                    <input class="form-check-input" type="checkbox" name="fasilitas_tambahan[]" id="fasilitas_{{ $item->id }}" value="{{ $item->id}}"
                                            data-biaya-tambahan="{{ $item->biaya_tambahan }}"
-                                        {{ in_array($item->id, old('fasilitas_tambahan', $selectedFasilitas)) ? 'checked' : '' }}>
+                                        {{ in_array($item->id, old('fasilitas_tambahan', $selectedFasilitas)) ? 'checked' : '' }}>1
                                     <label class="form-check-label" for="fasilitas_{{ $item->id }}">{{ $item->nama_fasilitas }} (Rp {{ number_format($item->biaya_tambahan, 0, ',', '.') }})</label>
                                 </div>
                             @endforeach

@@ -57,7 +57,7 @@ class FasilitasController extends Controller
     /**
      * Menampilkan formulir untuk mengedit fasilitas yang sudah ada.
      */
-    public function edit(Fasilitas $fasilita)
+    public function edit(Fasilitas $fasilitas)
     {
         $fasilitas = $fasilita;
         return view('admin.fasilitas.edit', compact('fasilitas'));
@@ -70,7 +70,7 @@ class FasilitasController extends Controller
     public function update(Request $request, Fasilitas $fasilitas)
     {
         $request->validate([
-            'nama_fasilitas' => ['required', 'string', 'max:255', Rule::unique('fasilitas')->ignore($fasilitas->id)],
+            'nama_fasilitas' => ['required', 'string', 'max:255', Rule::unique('fasilitas')->ignore($fasilitas->id_fasilitas)],
             'deskripsi' => 'nullable|string',
             'biaya_tambahan' => 'nullable|numeric|min:0',
             'icon' => 'nullable|string|max:255',
