@@ -113,10 +113,10 @@
                             <select name="kamar_id" id="kamar_id" class="form-control" required>
                                 <option value="">Pilih Kamar</option>
                                 @foreach ($kamars as $kamar)
-                                    {{-- Tambahkan data-harga-per-malam untuk JavaScript --}}
-                                    <option value="{{ $kamar->id }}"
+                                    {{-- PERBAIKAN: Gunakan id_kamar sebagai nilai --}}
+                                    <option value="{{ $kamar->id_kamar }}"
                                             data-harga-per-malam="{{ $kamar->tipeKamar->harga_per_malam }}"
-                                            {{ (old('kamar_id', $pemesanan->kamar_id) == $kamar->id) ? 'selected' : '' }}>
+                                            {{ (old('kamar_id', $pemesanan->kamar_id) == $kamar->id_kamar) ? 'selected' : '' }}>
                                         Kamar No. {{ $kamar->nomor_kamar }} (Tipe: {{ $kamar->tipeKamar->nama_tipe_kamar ?? 'N/A' }}) - Rp {{ number_format($kamar->tipeKamar->harga_per_malam ?? 0, 0, ',', '.') }} / malam
                                     </option>
                                 @endforeach
@@ -132,7 +132,10 @@
                             <label for="check_out_date">Tanggal Check-out</label>
                             <input type="date" name="check_out_date" id="check_out_date" class="form-control" value="{{ old('check_out_date', \Carbon\Carbon::parse($pemesanan->check_out_date)->format('Y-m-d')) }}" required>
                         </div>
-
+                        <div class="form-group mb-3">
+                            <label for="jumlah_tamu">Jumlah Tamu</label>
+                            <input type="number" name="jumlah_tamu" id="jumlah_tamu" class="form-control" value="{{ old('jumlah_tamu', $pemesanan->jumlah_tamu) }}" required min="1">
+                        </div>
                         <div class="form-group mb-3">
                             <label for="total_harga">Total Harga</label>
                             {{-- Buat input ini menjadi read-only karena akan diisi otomatis --}}
@@ -154,11 +157,11 @@
                             <label>Fasilitas Tambahan</label><br>
                             @foreach ($fasilitas as $item)
                                 <div class="form-check form-check-inline">
-                                    {{-- Tambahkan data-biaya-tambahan untuk JavaScript --}}
-                                    <input class="form-check-input" type="checkbox" name="fasilitas_tambahan[]" id="fasilitas_{{ $item->id }}" value="{{ $item->id}}"
+                                    {{-- PERBAIKAN: Gunakan id_fasilitas sebagai nilai --}}
+                                    <input class="form-check-input" type="checkbox" name="fasilitas_tambahan[]" id="fasilitas_{{ $item->id_fasilitas }}" value="{{ $item->id_fasilitas}}"
                                            data-biaya-tambahan="{{ $item->biaya_tambahan }}"
-                                        {{ in_array($item->id, old('fasilitas_tambahan', $selectedFasilitas)) ? 'checked' : '' }}>1
-                                    <label class="form-check-label" for="fasilitas_{{ $item->id }}">{{ $item->nama_fasilitas }} (Rp {{ number_format($item->biaya_tambahan, 0, ',', '.') }})</label>
+                                        {{ in_array($item->id_fasilitas, old('fasilitas_tambahan', $selectedFasilitas)) ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="fasilitas_{{ $item->id_fasilitas }}">{{ $item->nama_fasilitas }} (Rp {{ number_format($item->biaya_tambahan, 0, ',', '.') }})</label>
                                 </div>
                             @endforeach
                         </div>

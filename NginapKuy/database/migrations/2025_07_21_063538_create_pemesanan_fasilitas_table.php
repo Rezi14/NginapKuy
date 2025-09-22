@@ -10,20 +10,19 @@ return new class extends Migration
      * Run the migrations.
      */
     public function up(): void
-    {
-        Schema::create('pemesanan_fasilitas', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('pemesanan_id');
-            $table->unsignedBigInteger('fasilitas_id');
-            $table->timestamps();
+{
+    Schema::create('pemesanan_fasilitas', function (Blueprint $table) {
+        $table->id();
+        $table->unsignedBigInteger('pemesanan_id');
+        $table->unsignedBigInteger('fasilitas_id');
+        $table->timestamps();
 
-            $table->foreign('pemesanan_id')->references('id_pemesanan')->on('pemesanans')->onDelete('cascade');
-            $table->foreign('fasilitas_id')->references('id_fasilitas')->on('fasilitas')->onDelete('cascade');
+        $table->foreign('pemesanan_id')->references('id_pemesanan')->on('pemesanans')->onDelete('cascade');
+        $table->foreign('fasilitas_id')->references('id_fasilitas')->on('fasilitas')->onDelete('cascade');
 
-            // Agar tidak ada duplikasi fasilitas dalam satu pemesanan
-            $table->unique(['pemesanan_id', 'fasilitas_id']);
-        });
-    }
+        $table->unique(['pemesanan_id', 'fasilitas_id']);
+    });
+}
 
     /**
      * Reverse the migrations.

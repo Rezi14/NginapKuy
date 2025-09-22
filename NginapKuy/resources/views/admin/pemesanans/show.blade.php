@@ -160,7 +160,7 @@
                         @endif
 
                         {{-- Tombol Check-in --}}
-                        @if($pemesanan->status_pemesanan === 'checked_in')
+                        @if($pemesanan->status_pemesanan === 'confirmed')
                             <form action="{{ route('admin.pemesanans.checkin', $pemesanan->id_pemesanan) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin melakukan check-in pemesanan ini?');">
                                 @csrf
                                 @method('PATCH')

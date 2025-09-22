@@ -127,16 +127,6 @@
                                 <label for="new_user_email">Email Pelanggan Baru</label>
                                 <input type="email" name="new_user_email" id="new_user_email" class="form-control" value="{{ old('new_user_email') }}">
                             </div>
-                            {{-- BARIS INI DIHAPUS: Input Password
-                            <div class="form-group mb-3">
-                                <label for="new_user_password">Password Pelanggan Baru</label>
-                                <input type="password" name="new_user_password" id="new_user_password" class="form-control">
-                            </div>
-                            <div class="form-group mb-3">
-                                <label for="new_user_password_confirmation">Konfirmasi Password</label>
-                                <input type="password" name="new_user_password_confirmation" id="new_user_password_confirmation" class="form-control">
-                            </div>
-                            --}}
                         </div>
 
                         <div class="form-group mb-3">
@@ -144,9 +134,9 @@
                             <select name="kamar_id" id="kamar_id" class="form-control" required>
                                 <option value="">Pilih Kamar</option>
                                 @foreach ($kamars as $kamar)
-                                    <option value="{{ $kamar->id }}"
+                                    <option value="{{ $kamar->id_kamar }}"
                                             data-harga-per-malam="{{ $kamar->tipeKamar->harga_per_malam }}"
-                                            {{ old('kamar_id') == $kamar->id ? 'selected' : '' }}>
+                                            {{ old('kamar_id') == $kamar->id_kamar ? 'selected' : '' }}>
                                         Kamar No. {{ $kamar->nomor_kamar }} (Tipe: {{ $kamar->tipeKamar->nama_tipe_kamar ?? 'N/A' }}) - Rp {{ number_format($kamar->tipeKamar->harga_per_malam ?? 0, 0, ',', '.') }} / malam
                                     </option>
                                 @endforeach
@@ -162,7 +152,10 @@
                             <label for="check_out_date">Tanggal Check-out</label>
                             <input type="date" name="check_out_date" id="check_out_date" class="form-control" value="{{ old('check_out_date') }}" required>
                         </div>
-
+                        <div class="form-group mb-3">
+                            <label for="jumlah_tamu">Jumlah Tamu</label>
+                            <input type="number" name="jumlah_tamu" id="jumlah_tamu" class="form-control" value="{{ old('jumlah_tamu') }}" required min="1">
+                        </div>
                         <div class="form-group mb-3">
                             <label for="total_harga">Total Harga</label>
                             <input type="number" name="total_harga" id="total_harga" class="form-control" step="0.01" value="{{ old('total_harga') ?? 0 }}" required readonly>
@@ -183,10 +176,10 @@
                             <label>Fasilitas Tambahan</label><br>
                             @foreach ($fasilitas as $item)
                                 <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="checkbox" name="fasilitas_tambahan[]" id="fasilitas_{{ $item->id }}" value="{{ $item->id }}"
+                                    <input class="form-check-input" type="checkbox" name="fasilitas_tambahan[]" id="fasilitas_{{ $item->id_fasilitas }}" value="{{ $item->id_fasilitas }}"
                                            data-biaya-tambahan="{{ $item->biaya_tambahan }}"
-                                        {{ in_array($item->id, old('fasilitas_tambahan', [])) ? 'checked' : '' }}>
-                                    <label class="form-check-label" for="fasilitas_{{ $item->id }}">{{ $item->nama_fasilitas }} (Rp {{ number_format($item->biaya_tambahan, 0, ',', '.') }})</label>
+                                         {{ in_array($item->id_fasilitas, old('fasilitas_tambahan', [])) ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="fasilitas_{{ $item->id_fasilitas }}">{{ $item->nama_fasilitas }} (Rp {{ number_format($item->biaya_tambahan, 0, ',', '.') }})</label>
                                 </div>
                             @endforeach
                         </div>
@@ -223,36 +216,24 @@
             const userIdSelect = document.getElementById('user_id');
             const newUserNameInput = document.getElementById('new_user_name');
             const newUserEmailInput = document.getElementById('new_user_email');
-            // const newUserPasswordInput = document.getElementById('new_user_password'); // Dihapus
-            // const newUserPasswordConfirmationInput = document.getElementById('new_user_password_confirmation'); // Dihapus
-
 
             function toggleCustomerFields() {
                 if (document.getElementById('existingCustomer').checked) {
                     existingCustomerSection.style.display = 'block';
                     newCustomerSection.style.display = 'none';
-                    // Atur atribut required
                     userIdSelect.setAttribute('required', 'required');
                     newUserNameInput.removeAttribute('required');
                     newUserEmailInput.removeAttribute('required');
-                    // newUserPasswordInput.removeAttribute('required'); // Dihapus
-                    // newUserPasswordConfirmationInput.removeAttribute('required'); // Dihapus
                 } else {
                     existingCustomerSection.style.display = 'none';
                     newCustomerSection.style.display = 'block';
-                    // Atur atribut required
                     userIdSelect.removeAttribute('required');
                     newUserNameInput.setAttribute('required', 'required');
                     newUserEmailInput.setAttribute('required', 'required');
-                    // newUserPasswordInput.setAttribute('required', 'required'); // Dihapus
-                    // newUserPasswordConfirmationInput.setAttribute('required', 'required'); // Dihapus
                 }
-                // Hapus nilai jika bagian disembunyikan untuk menghindari pengiriman data yang tidak diinginkan
                 userIdSelect.value = '';
                 newUserNameInput.value = '';
                 newUserEmailInput.value = '';
-                // newUserPasswordInput.value = ''; // Dihapus
-                // newUserPasswordConfirmationInput.value = ''; // Dihapus
             }
 
             customerTypeRadios.forEach(radio => {

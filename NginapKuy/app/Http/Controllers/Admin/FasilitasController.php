@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Fasilitas; // Import model Fasilitas
+use App\Models\Fasilitas;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule; // Untuk validasi Rule::unique
+use Illuminate\Validation\Rule;
 
 class FasilitasController extends Controller
 {
@@ -32,10 +32,10 @@ class FasilitasController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'nama_fasilitas' => 'required|string|max:255|unique:fasilitas,nama_fasilitas',
+            'nama_fasilitas' => ['required', 'string', 'max:255', Rule::unique('fasilitas', 'nama_fasilitas')],
             'deskripsi' => 'nullable|string',
             'biaya_tambahan' => 'nullable|numeric|min:0',
-            'icon' => 'nullable|string|max:255', // Contoh: fas fa-wifi
+            'icon' => 'nullable|string|max:255',
         ]);
 
         try {
@@ -59,7 +59,6 @@ class FasilitasController extends Controller
      */
     public function edit(Fasilitas $fasilitas)
     {
-        $fasilitas = $fasilita;
         return view('admin.fasilitas.edit', compact('fasilitas'));
     }
 
@@ -70,7 +69,7 @@ class FasilitasController extends Controller
     public function update(Request $request, Fasilitas $fasilitas)
     {
         $request->validate([
-            'nama_fasilitas' => ['required', 'string', 'max:255', Rule::unique('fasilitas')->ignore($fasilitas->id_fasilitas)],
+            'nama_fasilitas' => ['required', 'string', 'max:255', Rule::unique('fasilitas')->ignore($fasilitas->id_fasilitas, 'id_fasilitas')],
             'deskripsi' => 'nullable|string',
             'biaya_tambahan' => 'nullable|numeric|min:0',
             'icon' => 'nullable|string|max:255',

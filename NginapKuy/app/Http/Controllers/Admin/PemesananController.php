@@ -1,18 +1,18 @@
 <?php
 
-namespace App\Http\Controllers\Admin; // Perhatikan: namespace yang benar
+namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Pemesanan;
 use App\Models\User;
-use App\Models\Role; // Import Role model
+use App\Models\Role;
 use App\Models\Kamar;
 use App\Models\Fasilitas;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str; // Import Str
-use Carbon\Carbon; // Import Carbon
+use Illuminate\Support\Str;
+use Carbon\Carbon;
 
 class PemesananController extends Controller
 {
@@ -23,7 +23,7 @@ class PemesananController extends Controller
     {
         // Hanya tampilkan pemesanan yang statusnya bukan 'paid' atau 'cancelled' di dashboard utama
         $pemesanans = Pemesanan::with(['user', 'kamar.tipeKamar', 'fasilitas'])
-                               ->whereNotIn('status_pemesanan', ['paid', 'cancelled']) // <-- Filter di sini
+                               ->whereNotIn('status_pemesanan', ['paid', 'cancelled'])
                                ->orderBy('check_in_date', 'desc')
                                ->get();
 
@@ -48,14 +48,14 @@ class PemesananController extends Controller
     public function store(Request $request)
     {
         $rules = [
-            'kamar_id' => 'required|exists:kamars,id',
+            'kamar_id' => 'required|exists:kamars,id_kamar',
             'check_in_date' => 'required|date',
             'check_out_date' => 'required|date|after:check_in_date',
+            'jumlah_tamu' => 'required|integer|min:1', // Perbaikan di sini
             'total_harga' => 'required|numeric|min:0',
-            // Tambahkan 'paid' ke daftar status yang valid
             'status_pemesanan' => 'required|string|in:pending,confirmed,checked_in,checked_out,cancelled,paid',
             'fasilitas_tambahan' => 'nullable|array',
-            'fasilitas_tambahan.*' => 'exists:fasilitas,id',
+            'fasilitas_tambahan.*' => 'exists:fasilitas,id_fasilitas',
         ];
 
         if ($request->input('customer_type') === 'new') {
@@ -74,7 +74,7 @@ class PemesananController extends Controller
                     'name' => $request->input('new_user_name'),
                     'email' => $request->input('new_user_email'),
                     'password' => Hash::make(Str::random(10)),
-                    'role_id' => Role::where('name', 'customer')->first()->id ?? 2, // Asumsi 'customer' role_id 2
+                    'role_id' => Role::where('name', 'customer')->first()->id ?? 2,
                 ]);
                 $userId = $newUser->id;
             } else {
@@ -86,6 +86,7 @@ class PemesananController extends Controller
                 'kamar_id' => $request->input('kamar_id'),
                 'check_in_date' => $request->input('check_in_date'),
                 'check_out_date' => $request->input('check_out_date'),
+                'jumlah_tamu' => $request->input('jumlah_tamu'), // Perbaikan di sini
                 'total_harga' => $request->input('total_harga'),
                 'status_pemesanan' => $request->input('status_pemesanan'),
             ]);
@@ -120,7 +121,7 @@ class PemesananController extends Controller
         $users = User::all();
         $kamars = Kamar::all();
         $fasilitas = Fasilitas::all();
-        $selectedFasilitas = $pemesanan->fasilitas->pluck('id')->toArray();
+        $selectedFasilitas = $pemesanan->fasilitas->pluck('id_fasilitas')->toArray();
 
         return view('admin.pemesanans.edit', compact('pemesanan', 'users', 'kamars', 'fasilitas', 'selectedFasilitas'));
     }
@@ -131,20 +132,21 @@ class PemesananController extends Controller
     public function update(Request $request, Pemesanan $pemesanan)
     {
         $rules = [
-            'kamar_id' => 'required|exists:kamars,id',
+            'kamar_id' => 'required|exists:kamars,id_kamar',
             'check_in_date' => 'required|date',
             'check_out_date' => 'required|date|after:check_in_date',
+            'jumlah_tamu' => 'required|integer|min:1', // Tambahkan ini
             'total_harga' => 'required|numeric|min:0',
             'status_pemesanan' => 'required|string|in:pending,confirmed,checked_in,checked_out,cancelled,paid',
             'fasilitas_tambahan' => 'nullable|array',
-            'fasilitas_tambahan.*' => 'exists:fasilitas,id',
+            'fasilitas_tambahan.*' => 'exists:fasilitas,id_fasilitas',
         ];
 
         $request->validate($rules);
 
         try {
             $selectedFasilitasIds = $request->input('fasilitas_tambahan', []);
-            $fasilitasTambahanObjects = Fasilitas::whereIn('id', $selectedFasilitasIds)->get();
+            $fasilitasTambahanObjects = Fasilitas::whereIn('id_fasilitas', $selectedFasilitasIds)->get();
             $biayaTambahanTotal = $fasilitasTambahanObjects->sum('biaya_tambahan');
 
             $kamar = Kamar::findOrFail($request->input('kamar_id'));
@@ -161,6 +163,7 @@ class PemesananController extends Controller
                 'kamar_id' => $request->input('kamar_id'),
                 'check_in_date' => $request->input('check_in_date'),
                 'check_out_date' => $request->input('check_out_date'),
+                'jumlah_tamu' => $request->input('jumlah_tamu'), // Tambahkan ini
                 'total_harga' => $finalTotalHarga,
                 'status_pemesanan' => $request->input('status_pemesanan'),
             ]);
